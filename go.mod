@@ -1,4 +1,4 @@
-module J2KSerializer
+module github.com/yizhuoliang/J2KSerializer
 
 go 1.19
 
