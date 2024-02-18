@@ -21,6 +21,7 @@ message VarResult {
   string varName = 1;
   string varType = 2;
   VarValue varValye = 3;
+  bool available = 4; // for serializer internal use
 }
 
 message VarValue {
