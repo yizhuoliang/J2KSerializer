@@ -18,88 +18,162 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// PongServiceClient is the client API for PongService service.
+// BrokerServiceClient is the client API for BrokerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PongServiceClient interface {
-	// Sends a greeting
+type BrokerServiceClient interface {
+	// NOTE: claim cell finished implies having no more FS access
+	ClaimCellFinished(ctx context.Context, in *VarResults, opts ...grpc.CallOption) (*Empty, error)
+	FetchVarResult(ctx context.Context, in *FetchVarResultRequest, opts ...grpc.CallOption) (*VarResult, error)
+	// The Ping-Pong service for cluster testing, remove in future
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
 }
 
-type pongServiceClient struct {
+type brokerServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPongServiceClient(cc grpc.ClientConnInterface) PongServiceClient {
-	return &pongServiceClient{cc}
+func NewBrokerServiceClient(cc grpc.ClientConnInterface) BrokerServiceClient {
+	return &brokerServiceClient{cc}
 }
 
-func (c *pongServiceClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {
-	out := new(HelloReply)
-	err := c.cc.Invoke(ctx, "/J2KSerializer.PongService/SayHello", in, out, opts...)
+func (c *brokerServiceClient) ClaimCellFinished(ctx context.Context, in *VarResults, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/J2KSerializer.BrokerService/ClaimCellFinished", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PongServiceServer is the server API for PongService service.
-// All implementations must embed UnimplementedPongServiceServer
+func (c *brokerServiceClient) FetchVarResult(ctx context.Context, in *FetchVarResultRequest, opts ...grpc.CallOption) (*VarResult, error) {
+	out := new(VarResult)
+	err := c.cc.Invoke(ctx, "/J2KSerializer.BrokerService/FetchVarResult", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *brokerServiceClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {
+	out := new(HelloReply)
+	err := c.cc.Invoke(ctx, "/J2KSerializer.BrokerService/SayHello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// BrokerServiceServer is the server API for BrokerService service.
+// All implementations must embed UnimplementedBrokerServiceServer
 // for forward compatibility
-type PongServiceServer interface {
-	// Sends a greeting
+type BrokerServiceServer interface {
+	// NOTE: claim cell finished implies having no more FS access
+	ClaimCellFinished(context.Context, *VarResults) (*Empty, error)
+	FetchVarResult(context.Context, *FetchVarResultRequest) (*VarResult, error)
+	// The Ping-Pong service for cluster testing, remove in future
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
-	mustEmbedUnimplementedPongServiceServer()
+	mustEmbedUnimplementedBrokerServiceServer()
 }
 
-// UnimplementedPongServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedPongServiceServer struct {
+// UnimplementedBrokerServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedBrokerServiceServer struct {
 }
 
-func (UnimplementedPongServiceServer) SayHello(context.Context, *HelloRequest) (*HelloReply, error) {
+func (UnimplementedBrokerServiceServer) ClaimCellFinished(context.Context, *VarResults) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClaimCellFinished not implemented")
+}
+func (UnimplementedBrokerServiceServer) FetchVarResult(context.Context, *FetchVarResultRequest) (*VarResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FetchVarResult not implemented")
+}
+func (UnimplementedBrokerServiceServer) SayHello(context.Context, *HelloRequest) (*HelloReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
 }
-func (UnimplementedPongServiceServer) mustEmbedUnimplementedPongServiceServer() {}
+func (UnimplementedBrokerServiceServer) mustEmbedUnimplementedBrokerServiceServer() {}
 
-// UnsafePongServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PongServiceServer will
+// UnsafeBrokerServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BrokerServiceServer will
 // result in compilation errors.
-type UnsafePongServiceServer interface {
-	mustEmbedUnimplementedPongServiceServer()
+type UnsafeBrokerServiceServer interface {
+	mustEmbedUnimplementedBrokerServiceServer()
 }
 
-func RegisterPongServiceServer(s grpc.ServiceRegistrar, srv PongServiceServer) {
-	s.RegisterService(&PongService_ServiceDesc, srv)
+func RegisterBrokerServiceServer(s grpc.ServiceRegistrar, srv BrokerServiceServer) {
+	s.RegisterService(&BrokerService_ServiceDesc, srv)
 }
 
-func _PongService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BrokerService_ClaimCellFinished_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VarResults)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BrokerServiceServer).ClaimCellFinished(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/J2KSerializer.BrokerService/ClaimCellFinished",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BrokerServiceServer).ClaimCellFinished(ctx, req.(*VarResults))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BrokerService_FetchVarResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FetchVarResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BrokerServiceServer).FetchVarResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/J2KSerializer.BrokerService/FetchVarResult",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BrokerServiceServer).FetchVarResult(ctx, req.(*FetchVarResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BrokerService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HelloRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PongServiceServer).SayHello(ctx, in)
+		return srv.(BrokerServiceServer).SayHello(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/J2KSerializer.PongService/SayHello",
+		FullMethod: "/J2KSerializer.BrokerService/SayHello",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PongServiceServer).SayHello(ctx, req.(*HelloRequest))
+		return srv.(BrokerServiceServer).SayHello(ctx, req.(*HelloRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// PongService_ServiceDesc is the grpc.ServiceDesc for PongService service.
+// BrokerService_ServiceDesc is the grpc.ServiceDesc for BrokerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var PongService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "J2KSerializer.PongService",
-	HandlerType: (*PongServiceServer)(nil),
+var BrokerService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "J2KSerializer.BrokerService",
+	HandlerType: (*BrokerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "ClaimCellFinished",
+			Handler:    _BrokerService_ClaimCellFinished_Handler,
+		},
+		{
+			MethodName: "FetchVarResult",
+			Handler:    _BrokerService_FetchVarResult_Handler,
+		},
+		{
 			MethodName: "SayHello",
-			Handler:    _PongService_SayHello_Handler,
+			Handler:    _BrokerService_SayHello_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

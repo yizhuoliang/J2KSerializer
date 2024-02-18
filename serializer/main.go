@@ -11,7 +11,7 @@ import (
 )
 
 type server struct {
-	pb.UnimplementedPongServiceServer
+	pb.UnimplementedBrokerServiceServer
 }
 
 func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
@@ -25,7 +25,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterPongServiceServer(s, &server{})
+	pb.RegisterBrokerServiceServer(s, &server{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

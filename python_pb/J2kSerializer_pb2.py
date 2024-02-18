@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13J2kSerializer.proto\x12\rJ2KSerializer\"1\n\x0cHelloRequest\x12\x10\n\x08senderId\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1d\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t2S\n\x0bPongService\x12\x44\n\x08SayHello\x12\x1b.J2KSerializer.HelloRequest\x1a\x19.J2KSerializer.HelloReply\"\x00\x42\x04Z\x02./b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13J2kSerializer.proto\x12\rJ2KSerializer\";\n\nVarResults\x12-\n\nvarResults\x18\x01 \x03(\x0b\x32\x19.J2KSerializer.VarResults\"X\n\tVarResult\x12\x0f\n\x07varName\x18\x01 \x01(\t\x12\x0f\n\x07varType\x18\x02 \x01(\t\x12)\n\x08varValye\x18\x03 \x01(\x0b\x32\x17.J2KSerializer.VarValue\"\xe5\x01\n\x08VarValue\x12\x14\n\nbool_value\x18\x01 \x01(\x08H\x00\x12\x15\n\x0bint32_value\x18\x02 \x01(\x05H\x00\x12\x15\n\x0bint64_value\x18\x03 \x01(\x03H\x00\x12\x16\n\x0cuint32_value\x18\x04 \x01(\rH\x00\x12\x16\n\x0cuint64_value\x18\x05 \x01(\x04H\x00\x12\x15\n\x0b\x66loat_value\x18\x06 \x01(\x02H\x00\x12\x16\n\x0c\x64ouble_value\x18\x07 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x08 \x01(\tH\x00\x12\x15\n\x0b\x62ytes_value\x18\t \x01(\x0cH\x00\x42\x07\n\x05value\"?\n\x15\x46\x65tchVarResultRequest\x12\x0f\n\x07varName\x18\x01 \x01(\t\x12\x15\n\rancestorCells\x18\x02 \x03(\x05\"\x07\n\x05\x45mpty\"1\n\x0cHelloRequest\x12\x10\n\x08senderId\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1d\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t2\xf1\x01\n\rBrokerService\x12\x46\n\x11\x43laimCellFinished\x12\x19.J2KSerializer.VarResults\x1a\x14.J2KSerializer.Empty\"\x00\x12R\n\x0e\x46\x65tchVarResult\x12$.J2KSerializer.FetchVarResultRequest\x1a\x18.J2KSerializer.VarResult\"\x00\x12\x44\n\x08SayHello\x12\x1b.J2KSerializer.HelloRequest\x1a\x19.J2KSerializer.HelloReply\"\x00\x42\x04Z\x02./b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -22,10 +22,20 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'J2kSerializer_pb2', _global
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\002./'
-  _globals['_HELLOREQUEST']._serialized_start=38
-  _globals['_HELLOREQUEST']._serialized_end=87
-  _globals['_HELLOREPLY']._serialized_start=89
-  _globals['_HELLOREPLY']._serialized_end=118
-  _globals['_PONGSERVICE']._serialized_start=120
-  _globals['_PONGSERVICE']._serialized_end=203
+  _globals['_VARRESULTS']._serialized_start=38
+  _globals['_VARRESULTS']._serialized_end=97
+  _globals['_VARRESULT']._serialized_start=99
+  _globals['_VARRESULT']._serialized_end=187
+  _globals['_VARVALUE']._serialized_start=190
+  _globals['_VARVALUE']._serialized_end=419
+  _globals['_FETCHVARRESULTREQUEST']._serialized_start=421
+  _globals['_FETCHVARRESULTREQUEST']._serialized_end=484
+  _globals['_EMPTY']._serialized_start=486
+  _globals['_EMPTY']._serialized_end=493
+  _globals['_HELLOREQUEST']._serialized_start=495
+  _globals['_HELLOREQUEST']._serialized_end=544
+  _globals['_HELLOREPLY']._serialized_start=546
+  _globals['_HELLOREPLY']._serialized_end=575
+  _globals['_BROKERSERVICE']._serialized_start=578
+  _globals['_BROKERSERVICE']._serialized_end=819
 # @@protoc_insertion_point(module_scope)
