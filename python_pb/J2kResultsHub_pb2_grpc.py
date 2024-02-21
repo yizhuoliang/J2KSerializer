@@ -2,10 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import J2kSerializer_pb2 as J2kSerializer__pb2
+import J2kResultsHub_pb2 as J2kResultsHub__pb2
 
 
-class BrokerServiceStub(object):
+class ResultsHubStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,23 +15,23 @@ class BrokerServiceStub(object):
             channel: A grpc.Channel.
         """
         self.ClaimCellFinished = channel.unary_unary(
-                '/J2KSerializer.BrokerService/ClaimCellFinished',
-                request_serializer=J2kSerializer__pb2.VarResults.SerializeToString,
-                response_deserializer=J2kSerializer__pb2.Empty.FromString,
+                '/J2KResultsHub.ResultsHub/ClaimCellFinished',
+                request_serializer=J2kResultsHub__pb2.VarResults.SerializeToString,
+                response_deserializer=J2kResultsHub__pb2.Empty.FromString,
                 )
         self.FetchVarResult = channel.unary_unary(
-                '/J2KSerializer.BrokerService/FetchVarResult',
-                request_serializer=J2kSerializer__pb2.FetchVarResultRequest.SerializeToString,
-                response_deserializer=J2kSerializer__pb2.VarResult.FromString,
+                '/J2KResultsHub.ResultsHub/FetchVarResult',
+                request_serializer=J2kResultsHub__pb2.FetchVarResultRequest.SerializeToString,
+                response_deserializer=J2kResultsHub__pb2.VarResult.FromString,
                 )
         self.SayHello = channel.unary_unary(
-                '/J2KSerializer.BrokerService/SayHello',
-                request_serializer=J2kSerializer__pb2.HelloRequest.SerializeToString,
-                response_deserializer=J2kSerializer__pb2.HelloReply.FromString,
+                '/J2KResultsHub.ResultsHub/SayHello',
+                request_serializer=J2kResultsHub__pb2.HelloRequest.SerializeToString,
+                response_deserializer=J2kResultsHub__pb2.HelloReply.FromString,
                 )
 
 
-class BrokerServiceServicer(object):
+class ResultsHubServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def ClaimCellFinished(self, request, context):
@@ -56,31 +56,31 @@ class BrokerServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_BrokerServiceServicer_to_server(servicer, server):
+def add_ResultsHubServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'ClaimCellFinished': grpc.unary_unary_rpc_method_handler(
                     servicer.ClaimCellFinished,
-                    request_deserializer=J2kSerializer__pb2.VarResults.FromString,
-                    response_serializer=J2kSerializer__pb2.Empty.SerializeToString,
+                    request_deserializer=J2kResultsHub__pb2.VarResults.FromString,
+                    response_serializer=J2kResultsHub__pb2.Empty.SerializeToString,
             ),
             'FetchVarResult': grpc.unary_unary_rpc_method_handler(
                     servicer.FetchVarResult,
-                    request_deserializer=J2kSerializer__pb2.FetchVarResultRequest.FromString,
-                    response_serializer=J2kSerializer__pb2.VarResult.SerializeToString,
+                    request_deserializer=J2kResultsHub__pb2.FetchVarResultRequest.FromString,
+                    response_serializer=J2kResultsHub__pb2.VarResult.SerializeToString,
             ),
             'SayHello': grpc.unary_unary_rpc_method_handler(
                     servicer.SayHello,
-                    request_deserializer=J2kSerializer__pb2.HelloRequest.FromString,
-                    response_serializer=J2kSerializer__pb2.HelloReply.SerializeToString,
+                    request_deserializer=J2kResultsHub__pb2.HelloRequest.FromString,
+                    response_serializer=J2kResultsHub__pb2.HelloReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'J2KSerializer.BrokerService', rpc_method_handlers)
+            'J2KResultsHub.ResultsHub', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class BrokerService(object):
+class ResultsHub(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -94,9 +94,9 @@ class BrokerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/J2KSerializer.BrokerService/ClaimCellFinished',
-            J2kSerializer__pb2.VarResults.SerializeToString,
-            J2kSerializer__pb2.Empty.FromString,
+        return grpc.experimental.unary_unary(request, target, '/J2KResultsHub.ResultsHub/ClaimCellFinished',
+            J2kResultsHub__pb2.VarResults.SerializeToString,
+            J2kResultsHub__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -111,9 +111,9 @@ class BrokerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/J2KSerializer.BrokerService/FetchVarResult',
-            J2kSerializer__pb2.FetchVarResultRequest.SerializeToString,
-            J2kSerializer__pb2.VarResult.FromString,
+        return grpc.experimental.unary_unary(request, target, '/J2KResultsHub.ResultsHub/FetchVarResult',
+            J2kResultsHub__pb2.FetchVarResultRequest.SerializeToString,
+            J2kResultsHub__pb2.VarResult.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -128,8 +128,8 @@ class BrokerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/J2KSerializer.BrokerService/SayHello',
-            J2kSerializer__pb2.HelloRequest.SerializeToString,
-            J2kSerializer__pb2.HelloReply.FromString,
+        return grpc.experimental.unary_unary(request, target, '/J2KResultsHub.ResultsHub/SayHello',
+            J2kResultsHub__pb2.HelloRequest.SerializeToString,
+            J2kResultsHub__pb2.HelloReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

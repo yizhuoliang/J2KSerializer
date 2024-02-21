@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package J2KSerializer;
+package J2KResultsHub;
 
 option go_package = "./";
 
-service BrokerService {
+service ResultsHub {
   // NOTE: for those rpcs, if the call fails, the pod should repeat, 
   // the call will eventually success when the broker recovers
   rpc ClaimCellFinished (VarResults) returns (Empty) {}
@@ -23,7 +23,7 @@ message VarResult {
   string varName = 1;
   string varType = 2;
   bytes varBytes = 3;
-  bool available = 4; // for serializer internal use
+  bool available = 4; // for ResultsHub internal use
 }
 
 message FetchVarResultRequest {

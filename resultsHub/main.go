@@ -9,13 +9,13 @@ import (
 	"os"
 	"time"
 
-	pb "github.com/yizhuoliang/J2KSerializer"
+	pb "github.com/yizhuoliang/J2KResultsHub"
 
 	"google.golang.org/grpc"
 )
 
-type brokerServer struct {
-	pb.UnimplementedBrokerServiceServer
+type ResultsHubServer struct {
+	pb.UnimplementedResultsHubServer
 
 	claimCellFinishedChan   chan *pb.VarResults
 	claimAcknowlegementChan chan *pb.Empty
@@ -24,17 +24,17 @@ type brokerServer struct {
 }
 
 // gRPC Handlers
-func (bs *brokerServer) ClaimCellFinished(ctx context.Context, in *pb.VarResults) (*pb.Empty, error) {
-	bs.claimCellFinishedChan <- in
-	<-bs.claimAcknowlegementChan // this makes sure everything is stored into disk
+func (server *ResultsHubServer) ClaimCellFinished(ctx context.Context, in *pb.VarResults) (*pb.Empty, error) {
+	server.claimCellFinishedChan <- in
+	<-server.claimAcknowlegementChan // this makes sure everything is stored into disk
 	return &pb.Empty{}, nil
 }
 
-func (bs *brokerServer) FetchVarResult(ctx context.Context, in *pb.FetchVarResultRequest) (*pb.VarResult, error) {
-	bs.fetchVarRequestChan <- in
+func (server *ResultsHubServer) FetchVarResult(ctx context.Context, in *pb.FetchVarResultRequest) (*pb.VarResult, error) {
 	var varResult *pb.VarResult
 	for {
-		varResult = <-bs.fetchVarReplyChan
+		server.fetchVarRequestChan <- in
+		varResult = <-server.fetchVarReplyChan
 		if varResult.Available {
 			break
 		}
@@ -45,7 +45,7 @@ func (bs *brokerServer) FetchVarResult(ctx context.Context, in *pb.FetchVarResul
 	return varResult, nil
 }
 
-func (bs *brokerServer) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+func (server *ResultsHubServer) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
 	log.Printf("Received: %v", in.GetMessage())
 	return &pb.HelloReply{Message: "Hello " + in.GetSenderId()}, nil
 }
@@ -60,23 +60,23 @@ func storeCellResultsIntoDisk(cellResult *CellVarResults) {
 	fileName := fmt.Sprintf("cell_%d_var_results.bin", cellResult.CellNumber)
 	file, err := os.Create(fileName)
 	if err != nil {
-		log.Fatalf("BROKER ERROR: storage component failed to open file %s: %v", fileName, err)
+		log.Fatalf("ERROR: storage component failed to open file %s: %v", fileName, err)
 	}
 	defer file.Close()
 
 	// Create a gob encoder to serialize and store into disk
 	encoder := gob.NewEncoder(file)
 	if err := encoder.Encode(*cellResult); err != nil {
-		log.Fatalf("BROKER ERROR: storage component failed to encode results of %s: %v", fileName, err)
+		log.Fatalf("ERROR: storage component failed to encode results of %s: %v", fileName, err)
 	}
 
 	// Flush to disk before returning
 	if err := file.Sync(); err != nil {
-		log.Fatalf("BROKER ERROR: failed to flush file %s to disk: %v", fileName, err)
+		log.Fatalf("ERROR: storage component failed to flush file %s to disk: %v", fileName, err)
 	}
 }
 
-func brokerRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan chan *pb.VarResults, claimAcknowlegementChan chan *pb.Empty, fetchVarRequestChan chan *pb.FetchVarResultRequest, fetchVarReplyChan chan *pb.VarResult) {
+func resultsHubRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan chan *pb.VarResults, claimAcknowlegementChan chan *pb.Empty, fetchVarRequestChan chan *pb.FetchVarResultRequest, fetchVarReplyChan chan *pb.VarResult) {
 	for {
 		select {
 		case results := <-claimCellFinishedChan:
@@ -86,7 +86,7 @@ func brokerRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan chan 
 				// if this cell already submitted once,
 				// later submissions from other pods are ignored
 				claimAcknowlegementChan <- &pb.Empty{}
-				return
+				continue
 			}
 
 			// build the varName to varResult map
@@ -104,7 +104,7 @@ func brokerRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan chan 
 			cellResults, ok := cells[request.VarAncestorCell]
 			if !ok {
 				fetchVarReplyChan <- &pb.VarResult{Available: false}
-				return
+				continue
 			}
 
 			// get the var
@@ -116,14 +116,14 @@ func brokerRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan chan 
 }
 
 func main() {
-	// initialize the broker's channels and records
+	// initialize the resultsHub's channels and records
 	cells := make(map[uint32]*CellVarResults, 0)
 	claimCellFinishedChan := make(chan *pb.VarResults, 1)
 	claimAcknowlegementChan := make(chan *pb.Empty, 1)
 	fetchVarRequestChan := make(chan *pb.FetchVarResultRequest, 1)
 	fetchVarReplyChan := make(chan *pb.VarResult, 1)
 
-	go brokerRoutine(cells, claimCellFinishedChan, claimAcknowlegementChan,
+	go resultsHubRoutine(cells, claimCellFinishedChan, claimAcknowlegementChan,
 		fetchVarRequestChan, fetchVarReplyChan)
 
 	// listen on 50051 by default
@@ -131,10 +131,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	// start the broker server
+	// start the resultsHub server
 	s := grpc.NewServer()
-	pb.RegisterBrokerServiceServer(s,
-		&brokerServer{claimCellFinishedChan: claimCellFinishedChan,
+	pb.RegisterResultsHubServer(s,
+		&ResultsHubServer{claimCellFinishedChan: claimCellFinishedChan,
 			claimAcknowlegementChan: claimAcknowlegementChan,
 			fetchVarRequestChan:     fetchVarRequestChan,
 			fetchVarReplyChan:       fetchVarReplyChan})

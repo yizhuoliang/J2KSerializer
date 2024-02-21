@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.21.4
-// source: J2KSerializer.proto
+// source: J2KResultsHub.proto
 
 package __
 
@@ -32,7 +32,7 @@ type VarResults struct {
 func (x *VarResults) Reset() {
 	*x = VarResults{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_J2KSerializer_proto_msgTypes[0]
+		mi := &file_J2KResultsHub_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -45,7 +45,7 @@ func (x *VarResults) String() string {
 func (*VarResults) ProtoMessage() {}
 
 func (x *VarResults) ProtoReflect() protoreflect.Message {
-	mi := &file_J2KSerializer_proto_msgTypes[0]
+	mi := &file_J2KResultsHub_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *VarResults) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VarResults.ProtoReflect.Descriptor instead.
 func (*VarResults) Descriptor() ([]byte, []int) {
-	return file_J2KSerializer_proto_rawDescGZIP(), []int{0}
+	return file_J2KResultsHub_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *VarResults) GetCellNumber() uint32 {
@@ -84,13 +84,13 @@ type VarResult struct {
 	VarName   string `protobuf:"bytes,1,opt,name=varName,proto3" json:"varName,omitempty"`
 	VarType   string `protobuf:"bytes,2,opt,name=varType,proto3" json:"varType,omitempty"`
 	VarBytes  []byte `protobuf:"bytes,3,opt,name=varBytes,proto3" json:"varBytes,omitempty"`
-	Available bool   `protobuf:"varint,4,opt,name=available,proto3" json:"available,omitempty"` // for serializer internal use
+	Available bool   `protobuf:"varint,4,opt,name=available,proto3" json:"available,omitempty"` // for ResultsHub internal use
 }
 
 func (x *VarResult) Reset() {
 	*x = VarResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_J2KSerializer_proto_msgTypes[1]
+		mi := &file_J2KResultsHub_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -103,7 +103,7 @@ func (x *VarResult) String() string {
 func (*VarResult) ProtoMessage() {}
 
 func (x *VarResult) ProtoReflect() protoreflect.Message {
-	mi := &file_J2KSerializer_proto_msgTypes[1]
+	mi := &file_J2KResultsHub_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -116,7 +116,7 @@ func (x *VarResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VarResult.ProtoReflect.Descriptor instead.
 func (*VarResult) Descriptor() ([]byte, []int) {
-	return file_J2KSerializer_proto_rawDescGZIP(), []int{1}
+	return file_J2KResultsHub_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *VarResult) GetVarName() string {
@@ -159,7 +159,7 @@ type FetchVarResultRequest struct {
 func (x *FetchVarResultRequest) Reset() {
 	*x = FetchVarResultRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_J2KSerializer_proto_msgTypes[2]
+		mi := &file_J2KResultsHub_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -172,7 +172,7 @@ func (x *FetchVarResultRequest) String() string {
 func (*FetchVarResultRequest) ProtoMessage() {}
 
 func (x *FetchVarResultRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_J2KSerializer_proto_msgTypes[2]
+	mi := &file_J2KResultsHub_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -185,7 +185,7 @@ func (x *FetchVarResultRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FetchVarResultRequest.ProtoReflect.Descriptor instead.
 func (*FetchVarResultRequest) Descriptor() ([]byte, []int) {
-	return file_J2KSerializer_proto_rawDescGZIP(), []int{2}
+	return file_J2KResultsHub_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *FetchVarResultRequest) GetVarName() string {
@@ -211,7 +211,7 @@ type Empty struct {
 func (x *Empty) Reset() {
 	*x = Empty{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_J2KSerializer_proto_msgTypes[3]
+		mi := &file_J2KResultsHub_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -224,7 +224,7 @@ func (x *Empty) String() string {
 func (*Empty) ProtoMessage() {}
 
 func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_J2KSerializer_proto_msgTypes[3]
+	mi := &file_J2KResultsHub_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -237,7 +237,7 @@ func (x *Empty) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Empty.ProtoReflect.Descriptor instead.
 func (*Empty) Descriptor() ([]byte, []int) {
-	return file_J2KSerializer_proto_rawDescGZIP(), []int{3}
+	return file_J2KResultsHub_proto_rawDescGZIP(), []int{3}
 }
 
 // The request message containing the sender's ID and a message.
@@ -253,7 +253,7 @@ type HelloRequest struct {
 func (x *HelloRequest) Reset() {
 	*x = HelloRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_J2KSerializer_proto_msgTypes[4]
+		mi := &file_J2KResultsHub_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -266,7 +266,7 @@ func (x *HelloRequest) String() string {
 func (*HelloRequest) ProtoMessage() {}
 
 func (x *HelloRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_J2KSerializer_proto_msgTypes[4]
+	mi := &file_J2KResultsHub_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -279,7 +279,7 @@ func (x *HelloRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HelloRequest.ProtoReflect.Descriptor instead.
 func (*HelloRequest) Descriptor() ([]byte, []int) {
-	return file_J2KSerializer_proto_rawDescGZIP(), []int{4}
+	return file_J2KResultsHub_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *HelloRequest) GetSenderId() string {
@@ -308,7 +308,7 @@ type HelloReply struct {
 func (x *HelloReply) Reset() {
 	*x = HelloReply{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_J2KSerializer_proto_msgTypes[5]
+		mi := &file_J2KResultsHub_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -321,7 +321,7 @@ func (x *HelloReply) String() string {
 func (*HelloReply) ProtoMessage() {}
 
 func (x *HelloReply) ProtoReflect() protoreflect.Message {
-	mi := &file_J2KSerializer_proto_msgTypes[5]
+	mi := &file_J2KResultsHub_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -334,7 +334,7 @@ func (x *HelloReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HelloReply.ProtoReflect.Descriptor instead.
 func (*HelloReply) Descriptor() ([]byte, []int) {
-	return file_J2KSerializer_proto_rawDescGZIP(), []int{5}
+	return file_J2KResultsHub_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *HelloReply) GetMessage() string {
@@ -344,17 +344,17 @@ func (x *HelloReply) GetMessage() string {
 	return ""
 }
 
-var File_J2KSerializer_proto protoreflect.FileDescriptor
+var File_J2KResultsHub_proto protoreflect.FileDescriptor
 
-var file_J2KSerializer_proto_rawDesc = []byte{
-	0x0a, 0x13, 0x4a, 0x32, 0x4b, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x72, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0d, 0x4a, 0x32, 0x4b, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c,
-	0x69, 0x7a, 0x65, 0x72, 0x22, 0x64, 0x0a, 0x0a, 0x56, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75, 0x6c,
+var file_J2KResultsHub_proto_rawDesc = []byte{
+	0x0a, 0x13, 0x4a, 0x32, 0x4b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x48, 0x75, 0x62, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0d, 0x4a, 0x32, 0x4b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74,
+	0x73, 0x48, 0x75, 0x62, 0x22, 0x64, 0x0a, 0x0a, 0x56, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75, 0x6c,
 	0x74, 0x73, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x65, 0x6c, 0x6c, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0a, 0x63, 0x65, 0x6c, 0x6c, 0x4e, 0x75, 0x6d, 0x62,
 	0x65, 0x72, 0x12, 0x36, 0x0a, 0x09, 0x76, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x73, 0x18,
-	0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x4a, 0x32, 0x4b, 0x53, 0x65, 0x72, 0x69, 0x61,
-	0x6c, 0x69, 0x7a, 0x65, 0x72, 0x2e, 0x56, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52,
+	0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x4a, 0x32, 0x4b, 0x52, 0x65, 0x73, 0x75, 0x6c,
+	0x74, 0x73, 0x48, 0x75, 0x62, 0x2e, 0x56, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52,
 	0x09, 0x76, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x73, 0x22, 0x79, 0x0a, 0x09, 0x56, 0x61,
 	0x72, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x61, 0x72, 0x4e, 0x61,
 	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x61, 0x72, 0x4e, 0x61, 0x6d,
@@ -376,54 +376,54 @@ var file_J2KSerializer_proto_rawDesc = []byte{
 	0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
 	0x65, 0x22, 0x26, 0x0a, 0x0a, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12,
 	0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x32, 0xf1, 0x01, 0x0a, 0x0d, 0x42, 0x72,
-	0x6f, 0x6b, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x46, 0x0a, 0x11, 0x43,
-	0x6c, 0x61, 0x69, 0x6d, 0x43, 0x65, 0x6c, 0x6c, 0x46, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x65, 0x64,
-	0x12, 0x19, 0x2e, 0x4a, 0x32, 0x4b, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x72,
-	0x2e, 0x56, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x1a, 0x14, 0x2e, 0x4a, 0x32,
-	0x4b, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x72, 0x2e, 0x45, 0x6d, 0x70, 0x74,
-	0x79, 0x22, 0x00, 0x12, 0x52, 0x0a, 0x0e, 0x46, 0x65, 0x74, 0x63, 0x68, 0x56, 0x61, 0x72, 0x52,
-	0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x24, 0x2e, 0x4a, 0x32, 0x4b, 0x53, 0x65, 0x72, 0x69, 0x61,
-	0x6c, 0x69, 0x7a, 0x65, 0x72, 0x2e, 0x46, 0x65, 0x74, 0x63, 0x68, 0x56, 0x61, 0x72, 0x52, 0x65,
-	0x73, 0x75, 0x6c, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x4a, 0x32,
-	0x4b, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x72, 0x2e, 0x56, 0x61, 0x72, 0x52,
-	0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0x00, 0x12, 0x44, 0x0a, 0x08, 0x53, 0x61, 0x79, 0x48, 0x65,
-	0x6c, 0x6c, 0x6f, 0x12, 0x1b, 0x2e, 0x4a, 0x32, 0x4b, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x69,
-	0x7a, 0x65, 0x72, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x1a, 0x19, 0x2e, 0x4a, 0x32, 0x4b, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x72,
-	0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x42, 0x04, 0x5a,
-	0x02, 0x2e, 0x2f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x32, 0xee, 0x01, 0x0a, 0x0a, 0x52, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x73, 0x48, 0x75, 0x62, 0x12, 0x46, 0x0a, 0x11, 0x43, 0x6c, 0x61, 0x69,
+	0x6d, 0x43, 0x65, 0x6c, 0x6c, 0x46, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x65, 0x64, 0x12, 0x19, 0x2e,
+	0x4a, 0x32, 0x4b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x48, 0x75, 0x62, 0x2e, 0x56, 0x61,
+	0x72, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x1a, 0x14, 0x2e, 0x4a, 0x32, 0x4b, 0x52, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x73, 0x48, 0x75, 0x62, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00,
+	0x12, 0x52, 0x0a, 0x0e, 0x46, 0x65, 0x74, 0x63, 0x68, 0x56, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75,
+	0x6c, 0x74, 0x12, 0x24, 0x2e, 0x4a, 0x32, 0x4b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x48,
+	0x75, 0x62, 0x2e, 0x46, 0x65, 0x74, 0x63, 0x68, 0x56, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75, 0x6c,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x4a, 0x32, 0x4b, 0x52, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x73, 0x48, 0x75, 0x62, 0x2e, 0x56, 0x61, 0x72, 0x52, 0x65, 0x73, 0x75,
+	0x6c, 0x74, 0x22, 0x00, 0x12, 0x44, 0x0a, 0x08, 0x53, 0x61, 0x79, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
+	0x12, 0x1b, 0x2e, 0x4a, 0x32, 0x4b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x48, 0x75, 0x62,
+	0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e,
+	0x4a, 0x32, 0x4b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x48, 0x75, 0x62, 0x2e, 0x48, 0x65,
+	0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x42, 0x04, 0x5a, 0x02, 0x2e, 0x2f,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_J2KSerializer_proto_rawDescOnce sync.Once
-	file_J2KSerializer_proto_rawDescData = file_J2KSerializer_proto_rawDesc
+	file_J2KResultsHub_proto_rawDescOnce sync.Once
+	file_J2KResultsHub_proto_rawDescData = file_J2KResultsHub_proto_rawDesc
 )
 
-func file_J2KSerializer_proto_rawDescGZIP() []byte {
-	file_J2KSerializer_proto_rawDescOnce.Do(func() {
-		file_J2KSerializer_proto_rawDescData = protoimpl.X.CompressGZIP(file_J2KSerializer_proto_rawDescData)
+func file_J2KResultsHub_proto_rawDescGZIP() []byte {
+	file_J2KResultsHub_proto_rawDescOnce.Do(func() {
+		file_J2KResultsHub_proto_rawDescData = protoimpl.X.CompressGZIP(file_J2KResultsHub_proto_rawDescData)
 	})
-	return file_J2KSerializer_proto_rawDescData
+	return file_J2KResultsHub_proto_rawDescData
 }
 
-var file_J2KSerializer_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_J2KSerializer_proto_goTypes = []interface{}{
-	(*VarResults)(nil),            // 0: J2KSerializer.VarResults
-	(*VarResult)(nil),             // 1: J2KSerializer.VarResult
-	(*FetchVarResultRequest)(nil), // 2: J2KSerializer.FetchVarResultRequest
-	(*Empty)(nil),                 // 3: J2KSerializer.Empty
-	(*HelloRequest)(nil),          // 4: J2KSerializer.HelloRequest
-	(*HelloReply)(nil),            // 5: J2KSerializer.HelloReply
+var file_J2KResultsHub_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_J2KResultsHub_proto_goTypes = []interface{}{
+	(*VarResults)(nil),            // 0: J2KResultsHub.VarResults
+	(*VarResult)(nil),             // 1: J2KResultsHub.VarResult
+	(*FetchVarResultRequest)(nil), // 2: J2KResultsHub.FetchVarResultRequest
+	(*Empty)(nil),                 // 3: J2KResultsHub.Empty
+	(*HelloRequest)(nil),          // 4: J2KResultsHub.HelloRequest
+	(*HelloReply)(nil),            // 5: J2KResultsHub.HelloReply
 }
-var file_J2KSerializer_proto_depIdxs = []int32{
-	1, // 0: J2KSerializer.VarResults.varResuls:type_name -> J2KSerializer.VarResult
-	0, // 1: J2KSerializer.BrokerService.ClaimCellFinished:input_type -> J2KSerializer.VarResults
-	2, // 2: J2KSerializer.BrokerService.FetchVarResult:input_type -> J2KSerializer.FetchVarResultRequest
-	4, // 3: J2KSerializer.BrokerService.SayHello:input_type -> J2KSerializer.HelloRequest
-	3, // 4: J2KSerializer.BrokerService.ClaimCellFinished:output_type -> J2KSerializer.Empty
-	1, // 5: J2KSerializer.BrokerService.FetchVarResult:output_type -> J2KSerializer.VarResult
-	5, // 6: J2KSerializer.BrokerService.SayHello:output_type -> J2KSerializer.HelloReply
+var file_J2KResultsHub_proto_depIdxs = []int32{
+	1, // 0: J2KResultsHub.VarResults.varResuls:type_name -> J2KResultsHub.VarResult
+	0, // 1: J2KResultsHub.ResultsHub.ClaimCellFinished:input_type -> J2KResultsHub.VarResults
+	2, // 2: J2KResultsHub.ResultsHub.FetchVarResult:input_type -> J2KResultsHub.FetchVarResultRequest
+	4, // 3: J2KResultsHub.ResultsHub.SayHello:input_type -> J2KResultsHub.HelloRequest
+	3, // 4: J2KResultsHub.ResultsHub.ClaimCellFinished:output_type -> J2KResultsHub.Empty
+	1, // 5: J2KResultsHub.ResultsHub.FetchVarResult:output_type -> J2KResultsHub.VarResult
+	5, // 6: J2KResultsHub.ResultsHub.SayHello:output_type -> J2KResultsHub.HelloReply
 	4, // [4:7] is the sub-list for method output_type
 	1, // [1:4] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -431,13 +431,13 @@ var file_J2KSerializer_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_J2KSerializer_proto_init() }
-func file_J2KSerializer_proto_init() {
-	if File_J2KSerializer_proto != nil {
+func init() { file_J2KResultsHub_proto_init() }
+func file_J2KResultsHub_proto_init() {
+	if File_J2KResultsHub_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_J2KSerializer_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_J2KResultsHub_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*VarResults); i {
 			case 0:
 				return &v.state
@@ -449,7 +449,7 @@ func file_J2KSerializer_proto_init() {
 				return nil
 			}
 		}
-		file_J2KSerializer_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_J2KResultsHub_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*VarResult); i {
 			case 0:
 				return &v.state
@@ -461,7 +461,7 @@ func file_J2KSerializer_proto_init() {
 				return nil
 			}
 		}
-		file_J2KSerializer_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_J2KResultsHub_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FetchVarResultRequest); i {
 			case 0:
 				return &v.state
@@ -473,7 +473,7 @@ func file_J2KSerializer_proto_init() {
 				return nil
 			}
 		}
-		file_J2KSerializer_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_J2KResultsHub_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Empty); i {
 			case 0:
 				return &v.state
@@ -485,7 +485,7 @@ func file_J2KSerializer_proto_init() {
 				return nil
 			}
 		}
-		file_J2KSerializer_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_J2KResultsHub_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HelloRequest); i {
 			case 0:
 				return &v.state
@@ -497,7 +497,7 @@ func file_J2KSerializer_proto_init() {
 				return nil
 			}
 		}
-		file_J2KSerializer_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_J2KResultsHub_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HelloReply); i {
 			case 0:
 				return &v.state
@@ -514,18 +514,18 @@ func file_J2KSerializer_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_J2KSerializer_proto_rawDesc,
+			RawDescriptor: file_J2KResultsHub_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_J2KSerializer_proto_goTypes,
-		DependencyIndexes: file_J2KSerializer_proto_depIdxs,
-		MessageInfos:      file_J2KSerializer_proto_msgTypes,
+		GoTypes:           file_J2KResultsHub_proto_goTypes,
+		DependencyIndexes: file_J2KResultsHub_proto_depIdxs,
+		MessageInfos:      file_J2KResultsHub_proto_msgTypes,
 	}.Build()
-	File_J2KSerializer_proto = out.File
-	file_J2KSerializer_proto_rawDesc = nil
-	file_J2KSerializer_proto_goTypes = nil
-	file_J2KSerializer_proto_depIdxs = nil
+	File_J2KResultsHub_proto = out.File
+	file_J2KResultsHub_proto_rawDesc = nil
+	file_J2KResultsHub_proto_goTypes = nil
+	file_J2KResultsHub_proto_depIdxs = nil
 }
