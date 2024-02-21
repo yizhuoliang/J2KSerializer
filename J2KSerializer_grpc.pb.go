@@ -22,6 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BrokerServiceClient interface {
+	// NOTE: for those rpcs, if the call fails, the pod should repeat,
+	// the call will eventually success when the broker recovers
 	ClaimCellFinished(ctx context.Context, in *VarResults, opts ...grpc.CallOption) (*Empty, error)
 	FetchVarResult(ctx context.Context, in *FetchVarResultRequest, opts ...grpc.CallOption) (*VarResult, error)
 	// The Ping-Pong service for cluster testing, remove in future
@@ -67,6 +69,8 @@ func (c *brokerServiceClient) SayHello(ctx context.Context, in *HelloRequest, op
 // All implementations must embed UnimplementedBrokerServiceServer
 // for forward compatibility
 type BrokerServiceServer interface {
+	// NOTE: for those rpcs, if the call fails, the pod should repeat,
+	// the call will eventually success when the broker recovers
 	ClaimCellFinished(context.Context, *VarResults) (*Empty, error)
 	FetchVarResult(context.Context, *FetchVarResultRequest) (*VarResult, error)
 	// The Ping-Pong service for cluster testing, remove in future

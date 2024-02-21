@@ -35,7 +35,9 @@ class BrokerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def ClaimCellFinished(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """NOTE: for those rpcs, if the call fails, the pod should repeat, 
+        the call will eventually success when the broker recovers
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
