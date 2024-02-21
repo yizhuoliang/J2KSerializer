@@ -5,7 +5,8 @@ package J2KSerializer;
 option go_package = "./";
 
 service BrokerService {
-  // NOTE: claim cell finished implies having no more FS access
+  // NOTE: for those rpcs, if the call fails, the pod should repeat, 
+  // the call will eventually success when the broker recovers
   rpc ClaimCellFinished (VarResults) returns (Empty) {}
   rpc FetchVarResult (FetchVarResultRequest) returns (VarResult) {}
   // The Ping-Pong service for cluster testing, remove in future
@@ -13,34 +14,21 @@ service BrokerService {
 }
 
 message VarResults {
-  repeated VarResults varResults = 1;
+  uint32 cellNumber = 1;
+  repeated VarResult varResuls = 2;
 }
 
 // The result of a single variable of a specific cell
 message VarResult {
   string varName = 1;
   string varType = 2;
-  VarValue varValye = 3;
+  bytes varBytes = 3;
   bool available = 4; // for serializer internal use
-}
-
-message VarValue {
-    oneof value {
-        bool bool_value = 1;
-        int32 int32_value = 2;
-        int64 int64_value = 3;
-        uint32 uint32_value = 4;
-        uint64 uint64_value = 5;
-        float float_value = 6;
-        double double_value = 7;
-        string string_value = 8;
-        bytes bytes_value = 9;
-    }
 }
 
 message FetchVarResultRequest {
   string varName = 1;
-  repeated int32 ancestorCells = 2;
+  uint32 varAncestorCell = 2;
 }
 
 message Empty {}

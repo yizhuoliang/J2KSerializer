@@ -35,8 +35,7 @@ class BrokerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def ClaimCellFinished(self, request, context):
-        """NOTE: claim cell finished implies having no more FS access
-        """
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
