@@ -25,12 +25,15 @@ type ResultsHubServer struct {
 
 // gRPC Handlers
 func (server *ResultsHubServer) ClaimCellFinished(ctx context.Context, in *pb.VarResults) (*pb.Empty, error) {
+	log.Printf("[RECEIVED] claim from cell_%d\n", in.CellNumber)
 	server.claimCellFinishedChan <- in
 	<-server.claimAcknowlegementChan // this makes sure everything is stored into disk
+	log.Printf("[SENDING] acknowlege the results from cell_%d\n", in.CellNumber)
 	return &pb.Empty{}, nil
 }
 
 func (server *ResultsHubServer) FetchVarResult(ctx context.Context, in *pb.FetchVarResultRequest) (*pb.VarResult, error) {
+	log.Printf("[RECEIVED] request fetching %s writen by cell_%d\n", in.VarName, in.VarAncestorCell)
 	var varResult *pb.VarResult
 	for {
 		server.fetchVarRequestChan <- in
@@ -46,7 +49,7 @@ func (server *ResultsHubServer) FetchVarResult(ctx context.Context, in *pb.Fetch
 }
 
 func (server *ResultsHubServer) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in.GetMessage())
+	log.Printf("[RECEIVED] testing message %v\n", in.GetMessage())
 	return &pb.HelloReply{Message: "Hello " + in.GetSenderId()}, nil
 }
 
@@ -60,19 +63,19 @@ func storeCellResultsIntoDisk(cellResult *CellVarResults) {
 	fileName := fmt.Sprintf("cell_%d_var_results.bin", cellResult.CellNumber)
 	file, err := os.Create(fileName)
 	if err != nil {
-		log.Fatalf("ERROR: storage component failed to open file %s: %v", fileName, err)
+		log.Fatalf("[ERROR] storage component failed to open file %s: %v\n", fileName, err)
 	}
 	defer file.Close()
 
 	// Create a gob encoder to serialize and store into disk
 	encoder := gob.NewEncoder(file)
 	if err := encoder.Encode(*cellResult); err != nil {
-		log.Fatalf("ERROR: storage component failed to encode results of %s: %v", fileName, err)
+		log.Fatalf("[ERROR] storage component failed to encode results of %s: %v\n", fileName, err)
 	}
 
 	// Flush to disk before returning
 	if err := file.Sync(); err != nil {
-		log.Fatalf("ERROR: storage component failed to flush file %s to disk: %v", fileName, err)
+		log.Fatalf("[ERROR] storage component failed to flush file %s to disk: %v\n", fileName, err)
 	}
 }
 
@@ -129,7 +132,7 @@ func main() {
 	// listen on 50051 by default
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatalf("[ERROR] failed to listen: %v", err)
 	}
 	// start the resultsHub server
 	s := grpc.NewServer()
@@ -140,6 +143,6 @@ func main() {
 			fetchVarReplyChan:       fetchVarReplyChan})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.Fatalf("[ERROR] failed to serve: %v", err)
 	}
 }
