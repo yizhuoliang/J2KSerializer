@@ -7,6 +7,8 @@ import (
 	"log"
 	"net"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	pb "github.com/yizhuoliang/J2KResultsHub"
@@ -118,9 +120,49 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan c
 	}
 }
 
+func loadCellResultsFromDisk(cells map[uint32]*CellVarResults) {
+	entries, err := os.ReadDir(".")
+	if err != nil {
+		log.Fatalf("[ERROR] Failed to read directory: %v\n", err)
+	}
+
+	loaded := 0
+	for _, entry := range entries {
+		fileName := entry.Name()
+		if strings.HasPrefix(fileName, "cell_") && strings.HasSuffix(fileName, "_var_results.bin") {
+			var cellNumber uint32
+			_, err := fmt.Sscanf(fileName, "cell_%d_var_results.bin", &cellNumber)
+			if err != nil {
+				log.Printf("[WARNING] Failed to parse cell number from file %s: %v\n", fileName, err)
+				continue
+			}
+
+			file, err := os.Open(filepath.Join(".", fileName))
+			if err != nil {
+				log.Printf("[WARNING] Failed to open file %s: %v\n", fileName, err)
+				continue
+			}
+
+			decoder := gob.NewDecoder(file)
+			var cellResult CellVarResults
+			if err := decoder.Decode(&cellResult); err != nil {
+				log.Printf("[WARNING] Failed to decode file %s: %v\n", fileName, err)
+				file.Close()
+				continue
+			}
+			file.Close()
+
+			cells[cellResult.CellNumber] = &cellResult
+			loaded += 1
+		}
+	}
+	log.Printf("[STARTING] Recovered %d results from disk", loaded)
+}
+
 func main() {
 	// initialize the resultsHub's channels and records
 	cells := make(map[uint32]*CellVarResults, 0)
+	loadCellResultsFromDisk(cells)
 	claimCellFinishedChan := make(chan *pb.VarResults, 1)
 	claimAcknowlegementChan := make(chan *pb.Empty, 1)
 	fetchVarRequestChan := make(chan *pb.FetchVarResultRequest, 1)
@@ -141,7 +183,7 @@ func main() {
 			claimAcknowlegementChan: claimAcknowlegementChan,
 			fetchVarRequestChan:     fetchVarRequestChan,
 			fetchVarReplyChan:       fetchVarReplyChan})
-	log.Printf("server listening at %v", lis.Addr())
+	log.Printf("[STARTING] gRPC server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("[ERROR] failed to serve: %v", err)
 	}

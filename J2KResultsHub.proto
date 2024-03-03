@@ -24,6 +24,8 @@ message VarResult {
   string varType = 2;
   bytes varBytes = 3;
   bool available = 4; // for ResultsHub internal use
+  bool isJson = 5;
+  string jsonString = 6;
 }
 
 message FetchVarResultRequest {

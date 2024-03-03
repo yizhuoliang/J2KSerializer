@@ -14,7 +14,7 @@ COPY . .
 
 # Build your program
 # -o specifies the output binary name, you can choose any name
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o resultsHub .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o results-hub .
 
 # Use a minimal base image to create the final stage
 FROM alpine:latest
@@ -23,10 +23,10 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 # Copy the binary from the builder stage
-COPY --from=builder /app/resultsHub .
+COPY --from=builder /app/results-hub .
 
 # Expose port (if your app listens on a port)
 EXPOSE 50051
 
 # Command to run the executable
-CMD ["./resultsHub"]
+CMD ["./results-hub"]
