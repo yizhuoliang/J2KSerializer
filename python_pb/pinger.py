@@ -19,10 +19,6 @@ def run():
     list2 = [1, 2, 3, 4]
     var2 = np.array(list2)
 
-    # Serialize data using pickle
-    var1_bytes = pickle.dumps(var1)
-    var2_bytes = pickle.dumps(var2)
-
     # Using the ResultsHubSubmission class
     submission = rh.ResultsHubSubmission(cell_number=1)
     submission.addVar('var1', var1)
