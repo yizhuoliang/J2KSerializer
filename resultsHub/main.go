@@ -61,8 +61,17 @@ type CellVarResults struct {
 	NameToResultMap map[string]*pb.VarResult
 }
 
+func getAppRootPath() string {
+	if _, err := os.Stat("/app"); os.IsNotExist(err) {
+		// /app does not exist, return "."
+		return "./"
+	}
+	return "/app/"
+}
+
 func storeCellResultsIntoDisk(cellResult *CellVarResults) {
-	fileName := fmt.Sprintf("cell_%d_var_results.bin", cellResult.CellNumber)
+	workDirName := getAppRootPath()
+	fileName := fmt.Sprintf("%scell_%d_var_results.bin", workDirName, cellResult.CellNumber) // Prefix with root directory
 	file, err := os.Create(fileName)
 	if err != nil {
 		log.Fatalf("[ERROR] storage component failed to open file %s: %v\n", fileName, err)
@@ -121,7 +130,8 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan c
 }
 
 func loadCellResultsFromDisk(cells map[uint32]*CellVarResults) {
-	entries, err := os.ReadDir(".")
+	workDirName := getAppRootPath()
+	entries, err := os.ReadDir(workDirName) // Read from root directory
 	if err != nil {
 		log.Fatalf("[ERROR] Failed to read directory: %v\n", err)
 	}
@@ -137,7 +147,7 @@ func loadCellResultsFromDisk(cells map[uint32]*CellVarResults) {
 				continue
 			}
 
-			file, err := os.Open(filepath.Join(".", fileName))
+			file, err := os.Open(filepath.Join(workDirName, fileName)) // Open from root directory
 			if err != nil {
 				log.Printf("[WARNING] Failed to open file %s: %v\n", fileName, err)
 				continue

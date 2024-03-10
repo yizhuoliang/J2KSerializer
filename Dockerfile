@@ -1,32 +1,34 @@
-# Start from a base image with Go installed
-FROM golang:1.17 as builder
+# # Start from a base image with Go installed
+# FROM golang:1.17 as builder
 
-# Set the working directory inside the container
+# # Set the working directory inside the container
+# WORKDIR /app
+
+# # Copy the Go Modules manifests
+# COPY go.mod .
+# COPY go.sum .
+# COPY resultsHub/main.go .
+# # COPY J2KResultsHub_grpc.pb.go .
+# # COPY J2KResultsHub.pb.go .
+
+# RUN go build -o bin .
+
+# ENTRYPOINT [ "/app/bin" ]
+
+# # Expose port (if your app listens on a port)
+# EXPOSE 50051
+
+FROM golang:1.17-alpine
+
 WORKDIR /app
 
-# Copy the Go Modules manifests
-COPY go.mod go.sum ./
-# Download Go modules
-RUN go mod download
+COPY go.mod ./
+COPY go.sum ./
 
-# Copy the rest of your project's sources
-COPY . .
+COPY . ./
 
-# Build your program
-# -o specifies the output binary name, you can choose any name
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o results-hub .
+RUN go build -o /bin/myapp resultsHub/main.go
+RUN chmod +x /bin/myapp
 
-# Use a minimal base image to create the final stage
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-
-WORKDIR /root/
-
-# Copy the binary from the builder stage
-COPY --from=builder /app/results-hub .
-
-# Expose port (if your app listens on a port)
 EXPOSE 50051
-
-# Command to run the executable
-CMD ["./results-hub"]
+CMD ["/bin/myapp"]
