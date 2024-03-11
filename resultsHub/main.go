@@ -62,11 +62,15 @@ type CellVarResults struct {
 }
 
 func getAppRootPath() string {
-	if _, err := os.Stat("/app"); os.IsNotExist(err) {
-		// /app does not exist, return "."
-		return "./"
+	if _, err := os.Stat("/app"); err == nil {
+		// we are in a container
+		if err := os.MkdirAll("/app/data/", os.ModePerm); err != nil {
+			log.Fatalf("[ERROR] failed to create /app/data/ directory: %v", err)
+		}
+		return "/app/data/"
 	}
-	return "/app/"
+	// we are running locally
+	return "./"
 }
 
 func storeCellResultsIntoDisk(cellResult *CellVarResults) {

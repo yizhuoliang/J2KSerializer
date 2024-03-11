@@ -31,4 +31,4 @@ RUN go build -o /bin/myapp resultsHub/main.go
 RUN chmod +x /bin/myapp
 
 EXPOSE 50051
-CMD ["/bin/myapp"]
+ENTRYPOINT ["/bin/myapp"]

@@ -5,11 +5,10 @@ import J2kResultsHub_pb2
 import J2kResultsHub_pb2_grpc
 
 class ResultsHubSubmission:
-    def __init__(self, cell_number):
-        import grpc
-        import pickle
-        import time
+    def __init__(self, cell_number, host='localhost'):
         self.cell_number = cell_number
+        self.host = host
+        self.port = '30051' 
         self.var_results = J2kResultsHub_pb2.VarResults(cellNumber=cell_number)
 
     def addVar(self, var_name, var):
@@ -29,7 +28,8 @@ class ResultsHubSubmission:
         # keep retrying until success
         while True:
             try:
-                with grpc.insecure_channel('localhost:50051') as channel:
+                # Use the host attribute
+                with grpc.insecure_channel(f'{self.host}:{self.port}') as channel:
                     stub = J2kResultsHub_pb2_grpc.ResultsHubStub(channel)
                     stub.ClaimCellFinished(self.var_results)
                     print("Submission RPC returned successfully.")
@@ -37,13 +37,13 @@ class ResultsHubSubmission:
             except grpc.RpcError as e:
                 print(f"Submission failed: {e}, retrying...")
                 time.sleep(2)  # Wait for 2 seconds before retrying
-        
-        print("RPC failed after maximum retries.")
 
-def fetchVarResult(varName, varAncestorCell):
+def fetchVarResult(varName, varAncestorCell, host='localhost'):
+    port = '30051'
     while True:
         try:
-            with grpc.insecure_channel('localhost:50051') as channel:
+            # Use the host argument
+            with grpc.insecure_channel(f'{host}:{port}') as channel:
                 stub = J2kResultsHub_pb2_grpc.ResultsHubStub(channel)
                 fetch_request = J2kResultsHub_pb2.FetchVarResultRequest(
                     varName=varName, varAncestorCell=varAncestorCell
