@@ -22,10 +22,12 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ResultsHubClient interface {
-	// NOTE: for those rpcs, if the call fails, the pod should repeat,
-	// the call will eventually success when the broker recovers
+	// NOTE: for those rpcs, if the call fails, the pod should retry,
+	// the call will eventually success when ResultsHub recovers
 	ClaimCellFinished(ctx context.Context, in *VarResults, opts ...grpc.CallOption) (*Empty, error)
 	FetchVarResult(ctx context.Context, in *FetchVarResultRequest, opts ...grpc.CallOption) (*VarResult, error)
+	// for synchronization between the cells, currently used for files RWs
+	WaitForCell(ctx context.Context, in *WaitCellRequest, opts ...grpc.CallOption) (*Empty, error)
 	// The Ping-Pong service for cluster testing, remove in future
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
 }
@@ -56,6 +58,15 @@ func (c *resultsHubClient) FetchVarResult(ctx context.Context, in *FetchVarResul
 	return out, nil
 }
 
+func (c *resultsHubClient) WaitForCell(ctx context.Context, in *WaitCellRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/J2KResultsHub.ResultsHub/WaitForCell", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *resultsHubClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {
 	out := new(HelloReply)
 	err := c.cc.Invoke(ctx, "/J2KResultsHub.ResultsHub/SayHello", in, out, opts...)
@@ -69,10 +80,12 @@ func (c *resultsHubClient) SayHello(ctx context.Context, in *HelloRequest, opts 
 // All implementations must embed UnimplementedResultsHubServer
 // for forward compatibility
 type ResultsHubServer interface {
-	// NOTE: for those rpcs, if the call fails, the pod should repeat,
-	// the call will eventually success when the broker recovers
+	// NOTE: for those rpcs, if the call fails, the pod should retry,
+	// the call will eventually success when ResultsHub recovers
 	ClaimCellFinished(context.Context, *VarResults) (*Empty, error)
 	FetchVarResult(context.Context, *FetchVarResultRequest) (*VarResult, error)
+	// for synchronization between the cells, currently used for files RWs
+	WaitForCell(context.Context, *WaitCellRequest) (*Empty, error)
 	// The Ping-Pong service for cluster testing, remove in future
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
 	mustEmbedUnimplementedResultsHubServer()
@@ -87,6 +100,9 @@ func (UnimplementedResultsHubServer) ClaimCellFinished(context.Context, *VarResu
 }
 func (UnimplementedResultsHubServer) FetchVarResult(context.Context, *FetchVarResultRequest) (*VarResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FetchVarResult not implemented")
+}
+func (UnimplementedResultsHubServer) WaitForCell(context.Context, *WaitCellRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WaitForCell not implemented")
 }
 func (UnimplementedResultsHubServer) SayHello(context.Context, *HelloRequest) (*HelloReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
@@ -140,6 +156,24 @@ func _ResultsHub_FetchVarResult_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ResultsHub_WaitForCell_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WaitCellRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ResultsHubServer).WaitForCell(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/J2KResultsHub.ResultsHub/WaitForCell",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ResultsHubServer).WaitForCell(ctx, req.(*WaitCellRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ResultsHub_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HelloRequest)
 	if err := dec(in); err != nil {
@@ -172,6 +206,10 @@ var ResultsHub_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FetchVarResult",
 			Handler:    _ResultsHub_FetchVarResult_Handler,
+		},
+		{
+			MethodName: "WaitForCell",
+			Handler:    _ResultsHub_WaitForCell_Handler,
 		},
 		{
 			MethodName: "SayHello",

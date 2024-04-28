@@ -19,17 +19,19 @@ import (
 type ResultsHubServer struct {
 	pb.UnimplementedResultsHubServer
 
-	claimCellFinishedChan   chan *pb.VarResults
-	claimAcknowlegementChan chan *pb.Empty
-	fetchVarRequestChan     chan *pb.FetchVarResultRequest
-	fetchVarReplyChan       chan *pb.VarResult
+	claimCellFinishedChan    chan *pb.VarResults
+	claimAcknowledgementChan chan bool
+	fetchVarRequestChan      chan *pb.FetchVarResultRequest
+	fetchVarReplyChan        chan *pb.VarResult
+	waitRequestChan          chan *pb.WaitCellRequest
+	waitAcknowledgementChan  chan bool
 }
 
 // gRPC Handlers
 func (server *ResultsHubServer) ClaimCellFinished(ctx context.Context, in *pb.VarResults) (*pb.Empty, error) {
 	log.Printf("[RECEIVED] claim from cell_%d\n", in.CellNumber)
 	server.claimCellFinishedChan <- in
-	<-server.claimAcknowlegementChan // this makes sure everything is stored into disk
+	<-server.claimAcknowledgementChan // this makes sure everything is stored into disk
 	log.Printf("[SENDING] acknowlege the results from cell_%d\n", in.CellNumber)
 	return &pb.Empty{}, nil
 }
@@ -48,6 +50,19 @@ func (server *ResultsHubServer) FetchVarResult(ctx context.Context, in *pb.Fetch
 		time.Sleep(time.Second)
 	}
 	return varResult, nil
+}
+
+func (server *ResultsHubServer) WaitForCell(ctx context.Context, in *pb.WaitCellRequest) (*pb.Empty, error) {
+	log.Printf("[RECEIVED] request for waiting cell%d\n", in.WaitFor)
+	for {
+		server.waitRequestChan <- in
+		if <-server.waitAcknowledgementChan {
+			break
+		}
+		time.Sleep(time.Second)
+	}
+	log.Printf("[SENDING] acknowledge for waiting cell%d\n", in.WaitFor)
+	return &pb.Empty{}, nil
 }
 
 func (server *ResultsHubServer) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
@@ -94,7 +109,7 @@ func storeCellResultsIntoDisk(cellResult *CellVarResults) {
 	}
 }
 
-func resultsHubRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan chan *pb.VarResults, claimAcknowlegementChan chan *pb.Empty, fetchVarRequestChan chan *pb.FetchVarResultRequest, fetchVarReplyChan chan *pb.VarResult) {
+func resultsHubRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan chan *pb.VarResults, claimAcknowledgementChan chan bool, fetchVarRequestChan chan *pb.FetchVarResultRequest, fetchVarReplyChan chan *pb.VarResult, waitRequestChan chan *pb.WaitCellRequest, waitAcknowledgementChan chan bool) {
 	for {
 		select {
 		case results := <-claimCellFinishedChan:
@@ -103,7 +118,7 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan c
 			if ok {
 				// if this cell already submitted once,
 				// later submissions from other pods are ignored
-				claimAcknowlegementChan <- &pb.Empty{}
+				claimAcknowledgementChan <- true
 				continue
 			}
 
@@ -115,7 +130,7 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan c
 
 			// serialize the CellVarResults of this cell and store into disk
 			storeCellResultsIntoDisk(cells[results.CellNumber])
-			claimAcknowlegementChan <- &pb.Empty{}
+			claimAcknowledgementChan <- true
 
 		case request := <-fetchVarRequestChan:
 			// check if the requested result is available
@@ -129,6 +144,15 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, claimCellFinishedChan c
 			theVar := cellResults.NameToResultMap[request.VarName]
 			theVar.Available = true
 			fetchVarReplyChan <- theVar
+
+		case request := <-waitRequestChan:
+			// check if the waitFor cell finished
+			_, ok := cells[request.WaitFor]
+			if !ok {
+				waitAcknowledgementChan <- false
+				continue
+			}
+			waitAcknowledgementChan <- true
 		}
 	}
 }
@@ -178,12 +202,14 @@ func main() {
 	cells := make(map[uint32]*CellVarResults, 0)
 	loadCellResultsFromDisk(cells)
 	claimCellFinishedChan := make(chan *pb.VarResults, 1)
-	claimAcknowlegementChan := make(chan *pb.Empty, 1)
+	claimAcknowledgementChan := make(chan bool, 1)
 	fetchVarRequestChan := make(chan *pb.FetchVarResultRequest, 1)
 	fetchVarReplyChan := make(chan *pb.VarResult, 1)
+	waitRequestChan := make(chan *pb.WaitCellRequest, 1)
+	waitAcknowledgementChan := make(chan bool, 1)
 
-	go resultsHubRoutine(cells, claimCellFinishedChan, claimAcknowlegementChan,
-		fetchVarRequestChan, fetchVarReplyChan)
+	go resultsHubRoutine(cells, claimCellFinishedChan, claimAcknowledgementChan,
+		fetchVarRequestChan, fetchVarReplyChan, waitRequestChan, waitAcknowledgementChan)
 
 	// listen on 50051 by default
 	lis, err := net.Listen("tcp", ":50051")
@@ -194,9 +220,11 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterResultsHubServer(s,
 		&ResultsHubServer{claimCellFinishedChan: claimCellFinishedChan,
-			claimAcknowlegementChan: claimAcknowlegementChan,
-			fetchVarRequestChan:     fetchVarRequestChan,
-			fetchVarReplyChan:       fetchVarReplyChan})
+			claimAcknowledgementChan: claimAcknowledgementChan,
+			fetchVarRequestChan:      fetchVarRequestChan,
+			fetchVarReplyChan:        fetchVarReplyChan,
+			waitRequestChan:          waitRequestChan,
+			waitAcknowledgementChan:  waitAcknowledgementChan})
 	log.Printf("[STARTING] gRPC server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("[ERROR] failed to serve: %v", err)

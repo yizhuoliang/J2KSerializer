@@ -24,6 +24,11 @@ class ResultsHubStub(object):
                 request_serializer=J2kResultsHub__pb2.FetchVarResultRequest.SerializeToString,
                 response_deserializer=J2kResultsHub__pb2.VarResult.FromString,
                 )
+        self.WaitForCell = channel.unary_unary(
+                '/J2KResultsHub.ResultsHub/WaitForCell',
+                request_serializer=J2kResultsHub__pb2.WaitCellRequest.SerializeToString,
+                response_deserializer=J2kResultsHub__pb2.Empty.FromString,
+                )
         self.SayHello = channel.unary_unary(
                 '/J2KResultsHub.ResultsHub/SayHello',
                 request_serializer=J2kResultsHub__pb2.HelloRequest.SerializeToString,
@@ -35,8 +40,8 @@ class ResultsHubServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def ClaimCellFinished(self, request, context):
-        """NOTE: for those rpcs, if the call fails, the pod should repeat, 
-        the call will eventually success when the broker recovers
+        """NOTE: for those rpcs, if the call fails, the pod should retry, 
+        the call will eventually success when ResultsHub recovers
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -44,6 +49,13 @@ class ResultsHubServicer(object):
 
     def FetchVarResult(self, request, context):
         """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def WaitForCell(self, request, context):
+        """for synchronization between the cells, currently used for files RWs
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -67,6 +79,11 @@ def add_ResultsHubServicer_to_server(servicer, server):
                     servicer.FetchVarResult,
                     request_deserializer=J2kResultsHub__pb2.FetchVarResultRequest.FromString,
                     response_serializer=J2kResultsHub__pb2.VarResult.SerializeToString,
+            ),
+            'WaitForCell': grpc.unary_unary_rpc_method_handler(
+                    servicer.WaitForCell,
+                    request_deserializer=J2kResultsHub__pb2.WaitCellRequest.FromString,
+                    response_serializer=J2kResultsHub__pb2.Empty.SerializeToString,
             ),
             'SayHello': grpc.unary_unary_rpc_method_handler(
                     servicer.SayHello,
@@ -114,6 +131,23 @@ class ResultsHub(object):
         return grpc.experimental.unary_unary(request, target, '/J2KResultsHub.ResultsHub/FetchVarResult',
             J2kResultsHub__pb2.FetchVarResultRequest.SerializeToString,
             J2kResultsHub__pb2.VarResult.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def WaitForCell(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/J2KResultsHub.ResultsHub/WaitForCell',
+            J2kResultsHub__pb2.WaitCellRequest.SerializeToString,
+            J2kResultsHub__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
