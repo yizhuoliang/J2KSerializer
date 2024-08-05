@@ -356,17 +356,17 @@ func parseStreamCells() (map[uint32]uint32, error) {
 	}
 
 	// Navigate through the map to extract the "processor-cells" list.
-	if streamProcessing, ok := jsonData["streamProcessing"].(map[string]interface{}); ok {
-		if cells, ok := streamProcessing["processor-cells"].([]interface{}); ok {
-			result := make(map[uint32]uint32)
-			for _, cell := range cells {
-				if num, ok := cell.(float64); ok { // JSON unmarshals numbers as float64 by default
-					result[uint32(num)] = 0
-				}
+
+	if cells, ok := jsonData["processor-cells"].([]interface{}); ok {
+		result := make(map[uint32]uint32)
+		for _, cell := range cells {
+			if num, ok := cell.(float64); ok { // JSON unmarshals numbers as float64 by default
+				result[uint32(num)] = 0
 			}
-			return result, nil
 		}
+		return result, nil
 	}
+
 	return nil, fmt.Errorf("[ERROR] The structure of JSON does not match expected format")
 }
 
@@ -408,7 +408,7 @@ func parseConsumers() (map[uint32][]uint32, error) {
 	}
 
 	// Unmarshal JSON data into the structurally defined map
-	var dependencies CellDependencies
+	var dependencies map[string][]string // Adjusted for string slices
 	err = json.Unmarshal(data, &dependencies)
 	if err != nil {
 		return nil, err
@@ -416,28 +416,21 @@ func parseConsumers() (map[uint32][]uint32, error) {
 
 	// Process dependencies to generate the final map
 	resultMap := make(map[uint32][]uint32)
-	for key, valueMap := range dependencies {
+	for key, valueSlice := range dependencies {
 		uintKey, err := strconv.ParseUint(key, 10, 32)
 		if err != nil {
 			return nil, err
 		}
 
-		uniqueCells := make(map[uint32]struct{}) // Use a set to avoid duplicates
-		for _, cells := range valueMap {
-			for _, cell := range cells {
-				uintCell, err := strconv.ParseUint(cell, 10, 32)
-				if err != nil {
-					return nil, err
-				}
-				if uintCell != uintKey { // Ignore self-references
-					uniqueCells[uint32(uintCell)] = struct{}{}
-				}
+		var uintValues []uint32
+		for _, val := range valueSlice {
+			uintVal, err := strconv.ParseUint(val, 10, 32)
+			if err != nil {
+				return nil, err
 			}
+			uintValues = append(uintValues, uint32(uintVal))
 		}
-
-		for cell := range uniqueCells {
-			resultMap[uint32(uintKey)] = append(resultMap[uint32(uintKey)], cell)
-		}
+		resultMap[uint32(uintKey)] = uintValues
 	}
 
 	return resultMap, nil
@@ -505,7 +498,17 @@ func main() {
 	if errSC == nil && errCA == nil && errCC == nil {
 		log.Printf("[STARTING] ResultsHub received stream processing info.\n")
 	} else {
+
 		log.Printf("[STARTING] ResultsHub starting WITHOUT stream processing info.\n")
+		if errSC != nil {
+			log.Printf("Error parsing stream cells: %v", errSC)
+		}
+		if errCA != nil {
+			log.Printf("Error parsing ancestors: %v", errCA)
+		}
+		if errCC != nil {
+			log.Printf("Error parsing consumers: %v", errCC)
+		}
 	}
 
 	go resultsHubRoutine(cells, buffers, claimCellFinishedChan, claimAcknowledgementChan, fetchVarRequestChan, fetchVarReplyChan, waitRequestChan, waitAcknowledgementChan, submitRecursiveVarsChan, replyRecursiveVarsChan, streamCells, cellAncestors, cellConsumers)
