@@ -11,6 +11,8 @@ service ResultsHub {
   rpc FetchVarResult (FetchVarResultRequest) returns (VarResult) {}
   // for synchronization between the cells, currently used for files RWs
   rpc WaitForCell (WaitCellRequest) returns (Empty) {}
+  // for stream processing 
+  rpc SubmitRecursiveVars (VarResults) returns (Empty) {}
   // The Ping-Pong service for cluster testing, remove in future
   rpc SayHello (HelloRequest) returns (HelloReply) {}
 }
@@ -33,6 +35,7 @@ message VarResult {
 message FetchVarResultRequest {
   string varName = 1;
   uint32 varAncestorCell = 2;
+  uint32 fetcher = 3;
 }
 
 message WaitCellRequest {
