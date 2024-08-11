@@ -99,6 +99,7 @@ func (server *ResultsHubServer) FetchVarResult(ctx context.Context, in *pb.Fetch
 		// Doing waiting on the server end simplifies the code on the user end
 		time.Sleep(time.Second)
 	}
+	log.Printf("[SENDING] give result from cell_%d to cell_%d\n", in.VarAncestorCell, in.Fetcher)
 	return varResult, nil
 }
 
@@ -145,7 +146,7 @@ func getAppRootPath() string {
 	if _, err := os.Stat("/app"); err == nil {
 		// we are in a container
 		if err := os.MkdirAll("/app/data/", os.ModePerm); err != nil {
-			log.Fatalf("[ERROR] failed to create /app/data/ directory: %v", err)
+			log.Printf("[ERROR] failed to create /app/data/ directory: %v", err)
 		}
 		return "/app/data/"
 	}
@@ -158,19 +159,19 @@ func storeCellResultsIntoDisk(cellResult *CellVarResults) {
 	fileName := fmt.Sprintf("%scell_%d_var_results.bin", workDirName, cellResult.CellNumber) // Prefix with root directory
 	file, err := os.Create(fileName)
 	if err != nil {
-		log.Fatalf("[ERROR] storage component failed to open file %s: %v\n", fileName, err)
+		log.Printf("[ERROR] storage component failed to open file %s: %v\n", fileName, err)
 	}
 	defer file.Close()
 
 	// Create a gob encoder to serialize and store into disk
 	encoder := gob.NewEncoder(file)
 	if err := encoder.Encode(*cellResult); err != nil {
-		log.Fatalf("[ERROR] storage component failed to encode results of %s: %v\n", fileName, err)
+		log.Printf("[ERROR] storage component failed to encode results of %s: %v\n", fileName, err)
 	}
 
 	// Flush to disk before returning
 	if err := file.Sync(); err != nil {
-		log.Fatalf("[ERROR] storage component failed to flush file %s to disk: %v\n", fileName, err)
+		log.Printf("[ERROR] storage component failed to flush file %s to disk: %v\n", fileName, err)
 	}
 }
 
@@ -210,7 +211,7 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, buffers map[uint32]*Cyc
 				for _, ancestor := range cellAncestors[results.CellNumber] {
 					ancestorCb, cbOk := buffers[ancestor]
 					if !cbOk {
-						log.Fatalf("[ERROR] Received a submit whose ancestor don't have buffer registered. Bookkeeping corrupted!\n")
+						log.Printf("[ERROR] Received a submit whose ancestor don't have buffer registered. Bookkeeping corrupted!\n")
 					}
 					newconsumers := []uint32{}
 					for _, consumer := range ancestorCb.consumers {
@@ -218,9 +219,13 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, buffers map[uint32]*Cyc
 							newconsumers = append(newconsumers, consumer)
 						}
 					}
+					log.Printf("[INFO] Cell_%d's buffer still have consumers: %v.\n", ancestor, newconsumers)
 					if len(newconsumers) == 0 {
 						ancestorCb.Dequeue()
-						ancestorCb.consumers = cellConsumers[results.CellNumber]
+						log.Printf("[INFO] Cell_%d's buffer dequeued.\n", ancestor)
+						ancestorCb.consumers = cellConsumers[ancestor]
+					} else {
+						ancestorCb.consumers = newconsumers
 					}
 				}
 
@@ -254,9 +259,11 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, buffers map[uint32]*Cyc
 				buff, ok := buffers[request.VarAncestorCell]
 				if !ok {
 					// buffer doesn't exist, means the ancestor cell didn't finish for the first time
+					fmt.Printf("[WARN] Cell_%d fetching, but buffer does not exist for cell:%d", request.Fetcher, request.VarAncestorCell)
 					fetchVarReplyChan <- &pb.VarResult{Available: false}
 					continue
 				}
+
 				// check if this cell is not consumed yet
 				canFetch := false
 				for _, consumer := range buff.consumers {
@@ -265,23 +272,23 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, buffers map[uint32]*Cyc
 					}
 				}
 				if !canFetch {
-					// this generation is already consmed
 					fetchVarReplyChan <- &pb.VarResult{Available: false}
 					continue
 				}
 
 				varMap, err := buff.Peek()
 				if err != nil {
-					// buffer exist but it is empty
+					fmt.Println("Error peeking buffer for cell:", request.VarAncestorCell, "Error:", err)
 					fetchVarReplyChan <- &pb.VarResult{Available: false}
 					continue
 				}
 
 				varRes, varAvailable := varMap[request.VarName]
 				if !varAvailable {
-					log.Fatalf("[ERROR] Corruption!\n")
+					log.Printf("[ERROR] Corruption!\n")
 				}
-				// fianlly the varRes is good and can be send back
+
+				// finally, the varRes is good and can be sent back
 				varRes.Available = true
 				fetchVarReplyChan <- varRes
 			} else {
@@ -296,7 +303,7 @@ func resultsHubRoutine(cells map[uint32]*CellVarResults, buffers map[uint32]*Cyc
 				theVar, ok := cellResults.NameToResultMap[request.VarName]
 				if !ok {
 					// if the variable is not actually there, THIS IS A SEVERE ISSUE OF JUP2KUB!
-					log.Fatalf("[ERROR] Variable %s requested by cell_%d does not exist though the ancestor finished\n", request.VarName, request.VarAncestorCell)
+					log.Printf("[ERROR] Variable %s requested by cell_%d does not exist though the ancestor finished\n", request.VarName, request.VarAncestorCell)
 				}
 
 				theVar.Available = true
@@ -372,7 +379,7 @@ func parseStreamCells() (map[uint32]uint32, error) {
 
 func parseAncestors() (map[uint32][]uint32, error) {
 	// Read the file content
-	jsonpath := filepath.Join(getAppRootPath(), "streamInfo.json")
+	jsonpath := filepath.Join(getAppRootPath(), "ancestors.json")
 	data, err := os.ReadFile(jsonpath)
 	if err != nil {
 		return nil, fmt.Errorf("ERROR] Error reading file: %w", err)
@@ -397,8 +404,6 @@ func parseAncestors() (map[uint32][]uint32, error) {
 	return dependencies, nil
 }
 
-type CellDependencies map[string]map[string][]string // temp struct for parsing script
-
 func parseConsumers() (map[uint32][]uint32, error) {
 	// Read the JSON file
 	jsonpath := filepath.Join(getAppRootPath(), "all_relations.json")
@@ -407,30 +412,46 @@ func parseConsumers() (map[uint32][]uint32, error) {
 		return nil, err
 	}
 
-	// Unmarshal JSON data into the structurally defined map
-	var dependencies map[string][]string // Adjusted for string slices
-	err = json.Unmarshal(data, &dependencies)
+	// Define a new type to match the JSON structure
+	type DependencyMap map[string][]string
+	var rawDependencies map[string]DependencyMap
+	err = json.Unmarshal(data, &rawDependencies)
 	if err != nil {
 		return nil, err
 	}
 
 	// Process dependencies to generate the final map
 	resultMap := make(map[uint32][]uint32)
-	for key, valueSlice := range dependencies {
+	for key, depMap := range rawDependencies {
 		uintKey, err := strconv.ParseUint(key, 10, 32)
 		if err != nil {
 			return nil, err
 		}
 
 		var uintValues []uint32
-		for _, val := range valueSlice {
-			uintVal, err := strconv.ParseUint(val, 10, 32)
-			if err != nil {
-				return nil, err
+		for _, ids := range depMap {
+			for _, id := range ids {
+				uintVal, err := strconv.ParseUint(id, 10, 32)
+				if err != nil {
+					return nil, err
+				}
+				uintValues = append(uintValues, uint32(uintVal))
 			}
-			uintValues = append(uintValues, uint32(uintVal))
 		}
 		resultMap[uint32(uintKey)] = uintValues
+	}
+
+	// remove self-reference
+	for key, values := range resultMap {
+		// Create a new slice to hold values without self-references
+		newValues := make([]uint32, 0)
+		for _, value := range values {
+			if value != key {
+				newValues = append(newValues, value)
+			}
+		}
+		// Update the map with the new slice
+		resultMap[key] = newValues
 	}
 
 	return resultMap, nil
@@ -440,7 +461,7 @@ func loadCellResultsFromDisk(cells map[uint32]*CellVarResults) {
 	workDirName := getAppRootPath()
 	entries, err := os.ReadDir(workDirName) // Read from root directory
 	if err != nil {
-		log.Fatalf("[ERROR] Failed to read directory: %v\n", err)
+		log.Printf("[ERROR] Failed to read directory: %v\n", err)
 	}
 
 	loaded := 0
@@ -497,6 +518,10 @@ func main() {
 	cellConsumers, errCC := parseConsumers()
 	if errSC == nil && errCA == nil && errCC == nil {
 		log.Printf("[STARTING] ResultsHub received stream processing info.\n")
+		fmt.Printf("Stream processing cells are: ")
+		for _, cell := range streamCells {
+			fmt.Printf("%d ", cell)
+		}
 	} else {
 
 		log.Printf("[STARTING] ResultsHub starting WITHOUT stream processing info.\n")
@@ -516,7 +541,7 @@ func main() {
 	// listen on 50051 by default
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
-		log.Fatalf("[ERROR] failed to listen: %v", err)
+		log.Printf("[ERROR] failed to listen: %v", err)
 	}
 	// start the resultsHub server
 	s := grpc.NewServer()
@@ -532,6 +557,6 @@ func main() {
 	})
 	log.Printf("[STARTING] gRPC server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("[ERROR] failed to serve: %v", err)
+		log.Printf("[ERROR] failed to serve: %v", err)
 	}
 }
